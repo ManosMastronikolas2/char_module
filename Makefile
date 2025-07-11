@@ -1,7 +1,24 @@
+# Name of the module (without the .ko extension)
 obj-m := charmod.o
 
+# Default target: build the module
 all:
-	make -C /lib/modules/6.8.0-60-generic/build M=$(PWD) modules
+	@echo "Building kernel module..."
+	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
 
+# Clean up build artifacts
 clean:
-	make -C /lib/modules/6.8.0-60-generic/build M=$(PWD) clean
+	@echo "Cleaning up..."
+	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+
+# Install (insert) the module
+install: all
+	@echo "Inserting module..."
+	sudo insmod ./charmod.ko || true
+
+# Uninstall (remove) the module
+uninstall:
+	@echo "Removing module..."
+	sudo rmmod charmod || true
+
+.PHONY: all clean install uninstall
