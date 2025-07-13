@@ -3,10 +3,7 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 
-int mod_open(struct inode* inode, struct file *fp){
-    printk("Opened module!\n");
-    return 0;
-}
+static int majorNum;
 
 struct file_operations fops = {
         .open = *mod_open,
@@ -15,6 +12,26 @@ struct file_operations fops = {
         .write = NULL
 
 };
+
+int mod_open(struct inode* inode, struct file *fp){
+    printk("Opened module!\n");
+    return 0;
+}
+
+int mod_release(){
+  printk("Closing module!\n");
+  return 0;
+
+}
+
+int mod_read(){
+
+}
+
+int mod_write(){
+}
+
+
 
 
 
