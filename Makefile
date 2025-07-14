@@ -1,24 +1,16 @@
-# Name of the module (without the .ko extension)
-obj-m := charmod.o
+ifneq ($(KERNELRELEASE),)
+	obj-m := charmod.o
+else
+	KDIR ?= /lib/modules/$(shell uname -r)/build
+	PWD := $(shell pwd)
 
-# Default target: build the module
-all:
-	@echo "Building kernel module..."
-	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+default:
+	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
-# Clean up build artifacts
+bear:
+	bear --append --output $(PWD)/.vscode/compile_commands.json -- $(MAKE) -C $(KDIR) M=$(PWD) modules
+
 clean:
-	@echo "Cleaning up..."
-	$(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	$(MAKE) -C $(KDIR) M=$(PWD) clean
 
-# Install (insert) the module
-install: all
-	@echo "Inserting module..."
-	sudo insmod ./charmod.ko || true
-
-# Uninstall (remove) the module
-uninstall:
-	@echo "Removing module..."
-	sudo rmmod charmod || true
-
-.PHONY: all clean install uninstall
+endif
