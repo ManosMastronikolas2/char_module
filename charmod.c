@@ -136,22 +136,23 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
     int quantum = dev->quantum, qset = dev->qset;
     int item_sz = quantum*qset;
     int node, set_pos, quantum_pos, node_pos;
-    ssize_t ret=0;
-
-    
-    if(*f_pos >= dev->size) return ret; //if offset exceeds device size, abort read 
-    
 
     node = *f_pos / item_sz; //which node (qset) of the list to access
     node_pos = *f_pos % item_sz; //position in that node
     set_pos = node_pos / quantum; //position inside the quantum set
     quantum_pos = node_pos % quantum; //offset inside quantum
+ 
 
-
-    ptr = dev->data;
-
-    if(!ptr) return -1; //if device has no data, return error
-    for(int i=0;i<node && ptr!=NULL;i++) ptr = ptr->next; //follow the list to correct qset
+    if(!dev->data){
+        dev->data = kmalloc(sizeof(struct mod_qset), GFP_KERNEL);
+        if(dev->data==NULL) return -ENOMEM;
+        dev->data->next = NULL;
+        ptr = dev->data;
+    }else{
+        ptr = dev->data;
+        for(int i=0;i<node && ptr!=NULL;i++) ptr = ptr->next; //follow the list to correct qset
+    }
+    
 
     if(ptr==NULL){ //if qset is not found, abort
         printk("Set not found!\n");
@@ -160,19 +161,19 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 
     if(ptr->data ==  NULL){ //if qset has no data, allocate data chunk
         ptr->data = kmalloc(qset*sizeof(char*), GFP_KERNEL);
-        if(ptr->data==NULL) return -1; //no memory could be allocated
+        if(ptr->data==NULL) return -ENOMEM; //no memory could be allocated
     }
 
     if(ptr->data[set_pos]==NULL) { //if qset[set_pos] has no data, allocate a quantum
         ptr->data[set_pos] = kmalloc(quantum, GFP_KERNEL);
-        if(ptr->data[set_pos]==NULL) return -1; //no memory could be allocated
+        if(ptr->data[set_pos]==NULL) return -ENOMEM; //no memory could be allocated
     }
 
     if(count > quantum-quantum_pos)  count = quantum-quantum_pos; //if data size to be written exceeds quantum, just write till the end of the quantum
 
     if(copy_from_user(ptr->data[set_pos] + quantum_pos, buff, count)){
         printk("Data could not be written!\n");
-        return -1;
+        return -EFAULT;
     }
 
     *f_pos += count;
