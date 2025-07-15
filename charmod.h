@@ -10,6 +10,8 @@
 #define QUANTUM_SZ 4000
 #define QUANTUM_SET_SZ 1000
 #define NR_DEVS 1
+#define MAJORNUM 0
+#define MINORNUM 0
 
 int mod_open(struct inode* inode, struct file *fp);
 int mod_release(struct inode *inode, struct file* fp);
@@ -34,13 +36,6 @@ struct mod_dev{
     struct cdev chardev; /*Character device structure*/
 };
 
-struct file_operations fops = {
-  .owner = THIS_MODULE,
-  .open = mod_open,
-  .release = mod_release,
-  .read = mod_read,
-  .write = mod_write
 
-};
 
 #endif
