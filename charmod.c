@@ -15,7 +15,7 @@ struct file_operations fops = {
 
 static int mod_init(void){
 
-    int err, dev_nr;
+    int err;
     dev_t dev;
 
     if(majorNum){ //static major number creation
@@ -30,6 +30,8 @@ static int mod_init(void){
         return -1;
     }
 
+    printk("Device created with major number: %d\n", majorNum);
+
     devices = kmalloc(NR_DEVS * sizeof(struct mod_dev), GFP_KERNEL);
     if(devices==NULL) {
         printk("Could not create devices!\n");
@@ -41,15 +43,34 @@ static int mod_init(void){
         devices[i].quantum = QUANTUM_SZ;
         devices[i].qset = QUANTUM_SET_SZ;
 
-        dev_nr = MKDEV(majorNum, minorNum+i);
+        dev = MKDEV(majorNum, minorNum+i);
         cdev_init(&(devices[i].chardev), &fops);
         devices[i].chardev.owner = THIS_MODULE;
         devices[i].chardev.ops = &fops;
-        err = cdev_add(&(devices[i].chardev), dev, )
+        err = cdev_add(&(devices[i].chardev), dev, 1);
+        if(err) {
+            printk("Error registering devices!\n");
+            return -1;
+        }
     }
-
+    return 0;
 }
 
+static void mod_cleanup(void){
+
+    dev_t dev = MKDEV(majorNum, minorNum);
+
+    if(devices != NULL) {
+
+        for(int i=0;i<NR_DEVS;i++){
+            cdev_del(&devices[i].chardev);
+        }
+
+        kfree(devices);
+    }
+
+    unregister_chrdev_region(dev, NR_DEVS);
+}
 
 int mod_open(struct inode* inode, struct file *fp){
 
@@ -107,8 +128,9 @@ ssize_t mod_read(struct file* fp, char __user* buff, size_t count, loff_t* f_pos
 
 }
 
-ssize_t mod_write(struct file* fp, char __user *buff, size_t count, loff_t *f_pos){
+ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t *f_pos){
 
+    printk("Write!\n");
     struct mod_dev* dev = fp->private_data;
     struct mod_qset* ptr;
     int quantum = dev->quantum, qset = dev->qset;
