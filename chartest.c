@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-#define DEVICE_PATH "/dev/charmod"
+#define DEVICE_PATH "/dev/charmod0"
 #define BUF_SIZE 128
 
 int main() {
