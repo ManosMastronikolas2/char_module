@@ -143,16 +143,22 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
     quantum_pos = node_pos % quantum; //offset inside quantum
  
 
-    if(!dev->data){
+    if(dev->data==NULL){ //if device has no data, allocate first qset
         dev->data = kmalloc(sizeof(struct mod_qset), GFP_KERNEL);
-        if(dev->data==NULL) return -ENOMEM;
         dev->data->next = NULL;
-        ptr = dev->data;
-    }else{
-        ptr = dev->data;
-        for(int i=0;i<node && ptr!=NULL;i++) ptr = ptr->next; //follow the list to correct qset
+    }
+
+    ptr = dev->data;
+    for(int i=0;i<node;i++){
+
+        if(ptr->next==NULL) { 
+            ptr->next = kmalloc(sizeof(struct mod_qset), GFP_KERNEL);
+            if(ptr->next == NULL) return -ENOMEM;
+            ptr->next->next = NULL;
+        }
     }
     
+
 
     if(ptr==NULL){ //if qset is not found, abort
         printk("Set not found!\n");
