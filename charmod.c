@@ -20,9 +20,9 @@ static int mod_init(void){
 
     if(majorNum){ //static major number creation
         dev = MKDEV(majorNum, minorNum);
-        err = register_chrdev_region(dev, NR_DEVS, "char_mod");
+        err = register_chrdev_region(dev, NR_DEVS, "charmod");
     }else{ //dynamic major number creation
-        alloc_chrdev_region(&dev, minorNum, NR_DEVS, "char_mod");
+        alloc_chrdev_region(&dev, minorNum, NR_DEVS, "charmod");
         majorNum = MAJOR(dev);
     }
     if(err<0) { //error
