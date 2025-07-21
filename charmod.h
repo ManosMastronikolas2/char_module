@@ -17,6 +17,7 @@ int mod_open(struct inode* inode, struct file *fp);
 int mod_release(struct inode *inode, struct file* fp);
 ssize_t mod_read(struct file* fp, char __user *buff, size_t count, loff_t *f_pos);
 ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t *f_pos);
+int mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg);
 static int mod_init(void);
 static void mod_cleanup(void);
 
@@ -34,8 +35,10 @@ struct mod_dev{
     size_t size; /*Total size of data on device*/
     struct mod_qset* data; /*Pointer to first quantum set*/
     struct cdev chardev; /*Character device structure*/
+    unsigned long user_addr;
+    size_t user_size;
 };
 
-
+enum ioctl_commands {SET_ADDR, SET_SIZE};
 
 #endif

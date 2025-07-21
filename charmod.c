@@ -5,11 +5,12 @@ int minorNum = MINORNUM;
 struct mod_dev* devices;
 
 struct file_operations fops = {
-  .owner = THIS_MODULE,
-  .open = mod_open,
-  .release = mod_release,
-  .read = mod_read,
-  .write = mod_write
+    .owner = THIS_MODULE,
+    .open = mod_open,
+    .release = mod_release,
+    .read = mod_read,
+    .write = mod_write,
+    .unlocked_ioctl = mod_ioctl
 
 };
 
@@ -190,7 +191,20 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 
 }
 
+int mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
 
+    switch(cmd){
+
+        case SET_ADDR:
+
+        case SET_SIZE:
+
+        default:
+            return -ENOTTY;
+    }
+
+    
+}
 
 
 module_init(mod_init);
