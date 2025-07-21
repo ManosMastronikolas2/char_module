@@ -193,17 +193,30 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 
 int mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
 
+    //assume that user first gives address and then size, change in the future
+    struct mod_dev* dev = fp->private_data;
+    unsigned long addr=0;
+    size_t size=0;
+
     switch(cmd){
 
         case SET_ADDR:
-
+            if(copy_from_user(&dev->user_addr, (unsigned long __user*)arg, sizeof(unsigned long))){
+                return -EFAULT;
+            }
         case SET_SIZE:
+            if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(unsigned long))){
+                return -EFAULT;
+            }
+
+            if(dev->user_size==0 || dev->user_size==0) return -EFAULT;
+
 
         default:
             return -ENOTTY;
     }
 
-    
+
 }
 
 
