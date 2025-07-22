@@ -2,5 +2,4 @@ all:
 	gcc -o chartest chartest.c -I /usr/local/cuda/include -I /usr/local/include/ -L /usr/local/lib/ -L /usr/local/cuda/lib64 -lcuda -lcudart
 
 clean:
-	rm -fr chartest
-~                                   
+	rm -fr chartest                                  
