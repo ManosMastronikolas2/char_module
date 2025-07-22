@@ -16,7 +16,7 @@ struct file_operations fops = {
 
 static int mod_init(void){
 
-    int err;
+    int err,i;
     dev_t dev;
 
     if(majorNum){ //static major number creation
@@ -40,7 +40,7 @@ static int mod_init(void){
         return -1;
     }
 
-    for(int i=0;i<NR_DEVS;i++) {
+    for(i=0;i<NR_DEVS;i++) {
         devices[i].quantum = QUANTUM_SZ;
         devices[i].qset = QUANTUM_SET_SZ;
 
@@ -60,10 +60,11 @@ static int mod_init(void){
 static void mod_cleanup(void){
 
     dev_t dev = MKDEV(majorNum, minorNum);
+    int i;
 
     if(devices != NULL) {
 
-        for(int i=0;i<NR_DEVS;i++){
+        for(i=0;i<NR_DEVS;i++){
             cdev_del(&devices[i].chardev);
         }
 
@@ -95,7 +96,7 @@ ssize_t mod_read(struct file* fp, char __user* buff, size_t count, loff_t* f_pos
     struct mod_qset* ptr;
     int quantum = dev->quantum, qset = dev->qset;
     int item_sz = quantum*qset;
-    int node, set_pos, quantum_pos, node_pos;
+    int i,node, set_pos, quantum_pos, node_pos;
     ssize_t ret=0;
 
     
@@ -110,7 +111,7 @@ ssize_t mod_read(struct file* fp, char __user* buff, size_t count, loff_t* f_pos
     ptr = dev->data;
 
     if(!ptr) return -1; //if device has no data, return error
-    for(int i=0;i<node && ptr!=NULL;i++) ptr = ptr->next; //follow the list to correct qset
+    for(i=0;i<node && ptr!=NULL;i++) ptr = ptr->next; //follow the list to correct qset
 
     if(ptr==NULL || ptr->data==NULL || ptr->data[set_pos]==NULL){ //if qset is not found, or qset has no data, or quantum in qset has no data, abort
         printk("Data not found!\n");
@@ -137,7 +138,7 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
     struct mod_qset* ptr;
     int quantum = dev->quantum, qset = dev->qset;
     int item_sz = quantum*qset;
-    int node, set_pos, quantum_pos, node_pos;
+    int i,node, set_pos, quantum_pos, node_pos;
 
     node = *f_pos / item_sz; //which node (qset) of the list to access
     node_pos = *f_pos % item_sz; //position in that node
@@ -151,7 +152,7 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
     }
 
     ptr = dev->data;
-    for(int i=0;i<node;i++){
+    for(i=0;i<node;i++){
 
         if(ptr->next==NULL) { 
             ptr->next = kmalloc(sizeof(struct mod_qset), GFP_KERNEL);
