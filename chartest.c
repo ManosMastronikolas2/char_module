@@ -6,6 +6,10 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
+
+enum ioctl_commands {SET_ADDR, SET_SIZE};
+
+
 #define DEVICE_PATH "/dev/charmod0"
 #define BUF_SIZE 128
 
@@ -45,8 +49,8 @@ int main() {
     printf("Read from device: %s\n", read_buf);
 
     // Optionally: perform an ioctl if implemented
-    // int result = ioctl(fd, MY_IOCTL_CMD, &some_struct);
-    // printf("ioctl result = %d\n", result);
+    int result = ioctl(fd, SET_ADDR, 100);
+    result = ioctl(fd, SET_SIZE, 100);
 
     // Close the device
     close(fd);

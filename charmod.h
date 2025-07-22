@@ -17,7 +17,7 @@ int mod_open(struct inode* inode, struct file *fp);
 int mod_release(struct inode *inode, struct file* fp);
 ssize_t mod_read(struct file* fp, char __user *buff, size_t count, loff_t *f_pos);
 ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t *f_pos);
-int mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg);
+long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg);
 static int mod_init(void);
 static void mod_cleanup(void);
 
