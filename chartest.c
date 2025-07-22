@@ -16,8 +16,6 @@ enum ioctl_commands {SET_ADDR, SET_SIZE};
 
 int main() {
     int fd;
-    char write_buf[] = "Hello from user space!\n";
-    char read_buf[BUF_SIZE] = {0};
 
     // Open the device
     fd = open(DEVICE_PATH, O_RDWR);
