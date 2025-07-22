@@ -5,6 +5,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <cuda.h>
 
 
 enum ioctl_commands {SET_ADDR, SET_SIZE};
@@ -25,32 +26,22 @@ int main() {
         return 1;
     }
 
-    // Write to the device
-    ssize_t bytes_written = write(fd, write_buf, strlen(write_buf));
-    if (bytes_written < 0) {
-        perror("Write failed");
-        close(fd);
-        return 1;
-    }
-    printf("Wrote %zd bytes to device.\n", bytes_written);
+    CUdevice dev;
+    CUcontext ctx;
 
-    // Reset file position to start (optional, depending on your driver)
-    lseek(fd, 0, SEEK_SET);
+    size_t num_elements = 1024*1024;
+    CUdeviceptr device_array;
 
-    // Read back from the device
-    ssize_t bytes_read = read(fd, read_buf, BUF_SIZE - 1);
-    if (bytes_read < 0) {
-        perror("Read failed");
-        close(fd);
-        return 1;
-    }
+    cuInit(0);
+    cuDeviceGet(&dev, 0);
+    cuCtxCreate(&ctx, 0, dev);
 
-    read_buf[bytes_read] = '\0'; // Ensure null termination
-    printf("Read from device: %s\n", read_buf);
+    cuMemAlloc(&device_array, num_elements * sizeof(char));
 
-    // Optionally: perform an ioctl if implemented
-    int result = ioctl(fd, SET_ADDR, 100);
-    result = ioctl(fd, SET_SIZE, 100);
+    fprintf(stdout, "device_array: %llu\n", device_array);
+
+    int result = ioctl(fd, SET_ADDR, device_array);
+    result = ioctl(fd, SET_SIZE, num_elements);
 
     // Close the device
     close(fd);
