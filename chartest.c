@@ -37,6 +37,9 @@ int main() {
     cuCtxCreate(&ctx, 0, dev);
 
     cuMemAlloc(&device_array, num_elements * sizeof(char));
+    int flag =1;
+    CUresult status = cuPointerSetAttribute(&flag,CU_POINTER_ATTRIBUTE_SYNC_MEMOPS,device_array);
+    if(status!=CUDA_SUCCESS) return -ENOTTY;
 
     fprintf(stdout, "device_array: %llu\n", device_array);
 

@@ -1,4 +1,5 @@
 #include "charmod.h"
+#include "/usr/src/nvidia-565.57.01/nvidia/nv-p2p.h"
 
 int majorNum = MAJORNUM;
 int minorNum = MINORNUM;
@@ -13,6 +14,8 @@ struct file_operations fops = {
     .unlocked_ioctl = mod_ioctl
 
 };
+
+static struct nvidia_p2p_page_table* pg_table = NULL;
 
 static int mod_init(void){
 
@@ -72,6 +75,8 @@ static void mod_cleanup(void){
     }
 
     unregister_chrdev_region(dev, NR_DEVS);
+
+   
 }
 
 int mod_open(struct inode* inode, struct file *fp){
@@ -84,7 +89,13 @@ int mod_open(struct inode* inode, struct file *fp){
 }
 
 int mod_release(struct inode *inode, struct file* fp){
+   struct mod_dev* dev = fp->private_data;
     printk("Closing module!\n");
+     if(pg_table != NULL) {
+        nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
+        printk("Released GPU pages!\n");
+        pg_table = NULL;
+    }
     return 0;
 
 }
@@ -193,12 +204,18 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 
 }
 
+void free_callback(void* data) {
+
+	nvidia_p2p_free_pages(pg_table);
+}
+
+
 long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
 
     //assume that user first gives address and then size, change in the future
     struct mod_dev* dev = fp->private_data;
-    //unsigned long addr=0;
-    //size_t size=0;
+    unsigned long addr=0;
+    size_t size=0;
 
     switch(cmd){
 
@@ -215,7 +232,17 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             }
 
             if(dev->user_size==0 || dev->user_size==0) return -EFAULT;
-            
+	    size = dev->user_size;
+	    addr = dev->user_addr;
+
+	    int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,*free_callback,NULL);
+
+	    if(ret) return -EIO;
+
+	    printk("Got %u GPU pages\n", pg_table->entries);
+    	    
+
+		    
             break;
         default:
             return -ENOTTY;

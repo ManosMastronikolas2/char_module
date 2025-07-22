@@ -20,7 +20,7 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg);
 static int mod_init(void);
 static void mod_cleanup(void);
-
+void free_callback(void*);
 
 /*Representation of one quantum set of data*/
 struct mod_qset {
