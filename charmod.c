@@ -206,7 +206,7 @@ ssize_t mod_write(struct file* fp, const char __user *buff, size_t count, loff_t
 
 void free_callback(void* data) {
 
-	nvidia_p2p_free_pages(pg_table);
+	nvidia_p2p_free_page_table(pg_table);
 }
 
 
