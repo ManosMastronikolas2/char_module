@@ -36,25 +36,20 @@ int nvidia_p2p_free_page_table(struct nvidia_p2p_page_table *page_table)
 }
 EXPORT_SYMBOL(nvidia_p2p_free_page_table);
 
-static int __init nv_p2p_dummy_init(void)
+
+static int __init dummy_init(void)
 {
     return 0;
 }
 
 
-static void __exit nv_p2p_dummy_cleanup(void)
+static void __exit dummy_cleanup(void)
 {
 }
 
 
 
-
-
-
-
-
-
-module_init(mod_init);
-module_exit(mod_cleanup);
+module_init(dummy_init);
+module_exit(dummy_cleanup);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Manos Mastronikolas");
