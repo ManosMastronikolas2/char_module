@@ -249,7 +249,7 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             break;
     }
 
-    return 0;
+    return pg_table->entries;
 }
 
 

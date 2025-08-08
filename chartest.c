@@ -44,6 +44,8 @@ int main() {
     int result = ioctl(fd, SET_ADDR, device_array);
     result = ioctl(fd, SET_SIZE, num_elements);
 
+    printf("Got %u entries\n", result);
+
     // Close the device
     close(fd);
     return 0;
