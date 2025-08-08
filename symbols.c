@@ -37,6 +37,17 @@ int nvidia_p2p_free_page_table(struct nvidia_p2p_page_table *page_table)
 EXPORT_SYMBOL(nvidia_p2p_free_page_table);
 
 
+int nvidia_p2p_put_pages(uint64_t p2p_token, uint32_t va_space,
+                         uint64_t virtual_address,
+                         struct nvidia_p2p_page_table *page_table)
+{
+    return -EINVAL;
+}
+EXPORT_SYMBOL(nvidia_p2p_put_pages);
+
+
+
+
 static int __init dummy_init(void)
 {
     return 0;
