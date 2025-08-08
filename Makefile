@@ -1,6 +1,6 @@
 ifneq ($(KERNELRELEASE),)
-	obj-m := charmod.o
 	obj-m := symbols.o
+	obj-m += charmod.o
 else
 	KDIR ?= /lib/modules/$(shell uname -r)/build
 	PWD := $(shell pwd)
