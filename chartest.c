@@ -41,10 +41,10 @@ int main() {
 
     fprintf(stdout, "device_array: %llu\n", device_array);
 
-    int result = ioctl(fd, SET_ADDR, device_array);
+    long result = ioctl(fd, SET_ADDR, device_array);
     result = ioctl(fd, SET_SIZE, num_elements);
 
-    printf("Got %u entries\n", result);
+    printf("Got %lu entries\n", result);
 
     // Close the device
     close(fd);

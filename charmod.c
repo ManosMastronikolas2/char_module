@@ -221,35 +221,38 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
 
         case SET_ADDR:
             printk("addr: %ld\n", arg);
-            if(copy_from_user(&dev->user_addr, (unsigned long __user*)arg, sizeof(unsigned long))){
+            if(copy_from_user(&dev->user_addr, (unsigned long __user*)arg, sizeof(dev->user_addr))){
+                                printk("1FAiled\n");
+
                 return -EFAULT;
             }
             break;
         case SET_SIZE:
             printk("size: %ld\n", arg);
-            if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(unsigned long))){
+            if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(dev->user_size))){
+                printk("2FAiled\n");
                 return -EFAULT;
             }
+            printk("Hello\n");
 
             if(dev->user_size==0 || dev->user_size==0) return -EFAULT;
-	    size = dev->user_size;
-	    addr = dev->user_addr;
+            size = dev->user_size;
+            addr = dev->user_addr;
 
-	    int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,*free_callback,NULL);
+            int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,*free_callback,NULL);
+            printk("Got %u GPU pages\n", pg_table->entries);
 
-	    if(ret) return -EIO;
+            if(ret || pg_table == NULL) return -EIO;
 
-	    printk("Got %u GPU pages\n", pg_table->entries);
-    	    
-
-		    
-            break;
+            printk("Got %u GPU pages\n", pg_table->entries);
+            return (long)(pg_table->entries);
+    	    break;
         default:
             return -ENOTTY;
             break;
     }
 
-    return pg_table->entries;
+    return 0;
 }
 
 
