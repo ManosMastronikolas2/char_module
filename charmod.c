@@ -228,7 +228,7 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             }
             break;
         case SET_SIZE:
-            printk("size: %ld\n", arg);
+            printk("size: %lu\n", arg);
             if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(dev->user_size))){
                 printk("2FAiled\n");
                 return -EFAULT;
@@ -239,7 +239,7 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             size = dev->user_size;
             addr = dev->user_addr;
 
-            int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,*free_callback,NULL);
+            int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,free_callback,NULL);
             printk("Got %u GPU pages\n", pg_table->entries);
 
             if(ret || pg_table == NULL) return -EIO;

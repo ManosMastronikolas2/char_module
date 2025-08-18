@@ -41,8 +41,8 @@ int main() {
 
     fprintf(stdout, "device_array: %llu\n", device_array);
 
-    long result = ioctl(fd, SET_ADDR, device_array);
-    result = ioctl(fd, SET_SIZE, num_elements);
+    long result = ioctl(fd, SET_ADDR, &device_array);
+    result = ioctl(fd, SET_SIZE, &num_elements);
 
     printf("Got %lu entries\n", result);
 
