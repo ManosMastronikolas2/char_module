@@ -216,24 +216,24 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
     struct mod_dev* dev = fp->private_data;
     unsigned long addr=0;
     size_t size=0;
+    int i;
 
     switch(cmd){
 
         case SET_ADDR:
-            printk("addr: %ld\n", arg);
             if(copy_from_user(&dev->user_addr, (unsigned long __user*)arg, sizeof(dev->user_addr))){
                                 printk("1FAiled\n");
 
                 return -EFAULT;
             }
+            printk("size: %zu\n", dev->user_addr);
             break;
         case SET_SIZE:
-            printk("size: %lu\n", arg);
             if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(dev->user_size))){
                 printk("2FAiled\n");
                 return -EFAULT;
             }
-            printk("Hello\n");
+            printk("size: %zu\n", dev->user_size);
 
             if(dev->user_size==0 || dev->user_size==0) return -EFAULT;
             size = dev->user_size;
@@ -245,6 +245,11 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             if(ret || pg_table == NULL) return -EIO;
 
             printk("Got %u GPU pages\n", pg_table->entries);
+            
+            for(i=0;i<pg_table->entries;i++){
+                /*print page physical addresses*/
+                printk("addr %d: 0x%llx\n", i,pg_table->pages[i]->physical_address);
+            }
             return (long)(pg_table->entries);
     	    break;
         default:
