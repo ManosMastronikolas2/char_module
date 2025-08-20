@@ -27,7 +27,7 @@ int main() {
     CUdevice dev;
     CUcontext ctx;
 
-    size_t num_elements = 1024*1024;
+    size_t num_elements = 100*1024*1024;
     CUdeviceptr device_array;
 
     cuInit(0);
