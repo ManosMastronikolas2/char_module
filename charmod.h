@@ -39,6 +39,6 @@ struct mod_dev{
     size_t user_size;
 };
 
-enum ioctl_commands {SET_ADDR, SET_SIZE};
+enum ioctl_commands {SET_ADDR, SET_SIZE, UNPIN_MEM};
 
 #endif

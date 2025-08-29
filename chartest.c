@@ -8,7 +8,7 @@
 #include <cuda.h>
 
 
-enum ioctl_commands {SET_ADDR, SET_SIZE};
+enum ioctl_commands {SET_ADDR, SET_SIZE, UNPIN_MEM};
 
 
 #define DEVICE_PATH "/dev/charmod0"
@@ -45,6 +45,8 @@ int main() {
     result = ioctl(fd, SET_SIZE, &num_elements);
 
     printf("Got %lu entries\n", result);
+
+    ioctl(fd, UNPIN_MEM, 0);
 
     // Close the device
     close(fd);

@@ -93,6 +93,7 @@ int mod_release(struct inode *inode, struct file* fp){
     printk("Closing module!\n");
      if(pg_table != NULL) {
         nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
+        nvidia_p2p_free_page_table(pg_table);
         printk("Released GPU pages!\n");
         pg_table = NULL;
     }
@@ -252,6 +253,12 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             }
             return (long)(pg_table->entries);
     	    break;
+        case UNPIN_MEM:
+            nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
+            nvidia_p2p_free_page_table(pg_table);
+            pg_table = NULL;
+            printk("Unpinned memory successfully\n");
+            break;
         default:
             return -ENOTTY;
             break;
