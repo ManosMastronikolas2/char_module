@@ -219,9 +219,11 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
     size_t size=0;
     int i;
 
+    printk("cmd=%u\n", cmd);
     switch(cmd){
 
         case SET_ADDR:
+            printk("Setting address\n");
             if(copy_from_user(&dev->user_addr, (unsigned long __user*)arg, sizeof(dev->user_addr))){
                                 printk("1FAiled\n");
 
@@ -230,6 +232,7 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             printk("size: %zu\n", dev->user_addr);
             break;
         case SET_SIZE:
+            printk("Setting size and pinning memory\n");
             if(copy_from_user(&dev->user_size, (size_t __user*)arg, sizeof(dev->user_size))){
                 printk("2FAiled\n");
                 return -EFAULT;
@@ -241,7 +244,6 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             addr = dev->user_addr;
 
             int ret = nvidia_p2p_get_pages(0,0,addr,size,&pg_table,free_callback,NULL);
-            printk("Got %u GPU pages\n", pg_table->entries);
 
             if(ret || pg_table == NULL) return -EIO;
 
@@ -254,10 +256,14 @@ long mod_ioctl(struct file* fp, unsigned int cmd, unsigned long arg){
             return (long)(pg_table->entries);
     	    break;
         case UNPIN_MEM:
-            nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
-            nvidia_p2p_free_page_table(pg_table);
-            pg_table = NULL;
-            printk("Unpinned memory successfully\n");
+            printk("Unpinning\n");
+            if(pg_table !=NULL){
+                nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
+                nvidia_p2p_free_page_table(pg_table);
+                pg_table = NULL;
+                printk("Unpinned memory successfully\n");
+
+            }
             break;
         default:
             return -ENOTTY;

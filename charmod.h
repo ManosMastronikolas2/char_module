@@ -3,6 +3,7 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/slab.h>
+#include "ioctl_commands.h"
 
 #ifndef CHARMOD_H
 #define CHARMOD_H
@@ -12,6 +13,8 @@
 #define NR_DEVS 1
 #define MAJORNUM 0
 #define MINORNUM 0
+
+
 
 int mod_open(struct inode* inode, struct file *fp);
 int mod_release(struct inode *inode, struct file* fp);
@@ -39,6 +42,5 @@ struct mod_dev{
     size_t user_size;
 };
 
-enum ioctl_commands {SET_ADDR, SET_SIZE, UNPIN_MEM};
 
 #endif

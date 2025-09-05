@@ -6,9 +6,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <cuda.h>
-
-
-enum ioctl_commands {SET_ADDR, SET_SIZE, UNPIN_MEM};
+#include "ioctl_commands.h"
 
 
 #define DEVICE_PATH "/dev/charmod0"
@@ -27,7 +25,7 @@ int main() {
     CUdevice dev;
     CUcontext ctx;
 
-    size_t num_elements = 100*1024*1024;
+    size_t num_elements = 1024*1024;
     CUdeviceptr device_array;
 
     cuInit(0);
@@ -43,10 +41,11 @@ int main() {
 
     long result = ioctl(fd, SET_ADDR, &device_array);
     result = ioctl(fd, SET_SIZE, &num_elements);
+    if(result<0) printf("set size failed\n");
 
     printf("Got %lu entries\n", result);
 
-    ioctl(fd, UNPIN_MEM, 0);
+    result= ioctl(fd, UNPIN_MEM, 0);
 
     // Close the device
     close(fd);
