@@ -13,7 +13,14 @@
 #define BUF_SIZE 128
 
 int main() {
-    int fd;
+    int fd,i;
+    int size = 10;
+    int arr[size], res[size];
+
+    for(i=1;i<=size;i++){
+        arr[i-1] = i;
+        
+    }
 
     // Open the device
     fd = open(DEVICE_PATH, O_RDWR);
@@ -43,10 +50,16 @@ int main() {
     result = ioctl(fd, SET_SIZE, &num_elements);
     if(result<0) printf("set size failed\n");
 
-    printf("Got %lu entries\n", result);
+    printf("Got %lu entries\n", result);    
+
+    cuMemcpyHtoD(device_array, arr, size*sizeof(int));
+    cuMemcpyDtoH(res, device_array, size*sizeof(int));
+
+    for(i=0;i<size;i++) printf("%d ", res[i]);
+    printf("\n");
+
 
     result= ioctl(fd, UNPIN_MEM, 0);
-
     // Close the device
     close(fd);
     return 0;
