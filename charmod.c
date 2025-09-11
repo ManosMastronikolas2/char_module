@@ -61,7 +61,8 @@ static int mod_init(void){
 }
 
 static void mod_cleanup(void){
-
+    
+    printk("Closing module!\n");
     dev_t dev = MKDEV(majorNum, minorNum);
     int i;
 
@@ -90,8 +91,7 @@ int mod_open(struct inode* inode, struct file *fp){
 
 int mod_release(struct inode *inode, struct file* fp){
    struct mod_dev* dev = fp->private_data;
-    printk("Closing module!\n");
-     if(pg_table != NULL) {
+    if(pg_table != NULL) {
         nvidia_p2p_put_pages(0,0,dev->user_addr,pg_table);
         nvidia_p2p_free_page_table(pg_table);
         printk("Released GPU pages!\n");
