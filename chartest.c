@@ -51,14 +51,16 @@ int main() {
     if(result<0) printf("set size failed\n");
 
     printf("Got %lu entries\n", result);    
+    /*
 
+    //WRITES TO BUFFER AND THEN READS IT BACK 
     cuMemcpyHtoD(device_array, arr, size*sizeof(int));
     cuMemcpyDtoH(res, device_array, size*sizeof(int));
 
     for(i=0;i<size;i++) printf("%d ", res[i]);
     printf("\n");
 
-
+    */
     result= ioctl(fd, UNPIN_MEM, 0);
     // Close the device
     close(fd);
